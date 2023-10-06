@@ -1,0 +1,33 @@
+C:\Users\jerry\AppData\Local\Programs\CLion\bin\cmake\win\x64\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -DCMAKE_MAKE_PROGRAM=C:/Users/jerry/AppData/Local/Programs/CLion/bin/ninja/win/x64/ninja.exe -G Ninja -S C:\Jerry\Code\Python\gaussian-splatting\submodules\diff-gaussian-rasterization -B C:\Jerry\Code\Python\gaussian-splatting\submodules\diff-gaussian-rasterization\cmake-build-debug
+CMake Error at C:/Users/jerry/AppData/Local/Programs/CLion/bin/cmake/win/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:751 (message):
+  Compiling the CUDA compiler identification source file
+  "CMakeCUDACompilerId.cu" failed.
+
+  Compiler: C:/Program Files/NVIDIA GPU Computing
+  Toolkit/CUDA/v11.7/bin/nvcc.exe
+
+  Build flags:
+
+  Id flags: --keep;--keep-dir;tmp -v
+
+
+
+  The output was:
+
+  1
+
+  nvcc fatal : Cannot find compiler 'cl.exe' in PATH
+
+
+
+
+
+Call Stack (most recent call first):
+  C:/Users/jerry/AppData/Local/Programs/CLion/bin/cmake/win/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:8 (CMAKE_DETERMINE_COMPILER_ID_BUILD)
+  C:/Users/jerry/AppData/Local/Programs/CLion/bin/cmake/win/x64/share/cmake-3.26/Modules/CMakeDetermineCompilerId.cmake:53 (__determine_compiler_id_test)
+  C:/Users/jerry/AppData/Local/Programs/CLion/bin/cmake/win/x64/share/cmake-3.26/Modules/CMakeDetermineCUDACompiler.cmake:307 (CMAKE_DETERMINE_COMPILER_ID)
+  CMakeLists.txt:14 (project)
+
+
+CMake Error: CMAKE_CXX_COMPILER not set, after EnableLanguage
+-- Configuring incomplete, errors occurred!
