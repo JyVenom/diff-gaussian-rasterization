@@ -414,7 +414,10 @@ renderCUDA(
 	float3* __restrict__ dL_dmean2D,
 	float4* __restrict__ dL_dconic2D,
 	float* __restrict__ dL_dopacity,
-	float* __restrict__ dL_dcolors)
+	float* __restrict__ dL_dcolors,
+	float* __restrict__ dL_dsd,
+	float* __restrict__ dL_dsp,
+	float s)
 {
 	// We rasterize again. Compute necessary block info.
 	auto block = cg::this_thread_block();
@@ -466,6 +469,11 @@ renderCUDA(
 	// screen-space viewport corrdinates (-1 to 1)
 	const float ddelx_dx = 0.5 * W;
 	const float ddely_dy = 0.5 * H;
+
+	int last_global_id = -1;
+	float last_dl_dopaci = 0;
+	float last_opac = 0;
+	float last_sdf = 0;
 
 	// Traverse all Gaussians
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -572,6 +580,40 @@ renderCUDA(
 
 			// Update gradients w.r.t. opacity of the Gaussian
 			atomicAdd(&(dL_dopacity[global_id]), G * dL_dalpha);
+
+			// Update gradients w.r.t. SDF of the Gaussian
+			float dl_dopaci = G * dL_dalpha;
+			float opac = sigmoid_s(con_o.w, s);
+			float ldd = ldd_s(con_o.w, s);
+			atomicAdd(&(dL_dsd[global_id]), dl_dopaci * (last_opac * ldd / opac / opac));  // dl_dopacity * dopacity_dsd
+
+			// Update gradients w.r.t. SDF of the last Gaussian
+			if (last_global_id != -1) {
+				float last_ldd = ldd_s(last_sdf, s);
+				atomicAdd(&(dL_dsd[last_global_id]), last_dl_dopaci * (-last_ldd / opac));  // dl_dopacity * dopacity_dsd
+
+				atomicAdd(&(dL_dsp[0]), dl_dopaci * ((-last_ldd * opac + ldd * last_opac) / opac / opac));  // dl_dopacity * dopacity_dsp
+			}
+
+//            // Update gradients w.r.t. SDF of the Gaussian
+//            float dl_dopaci = G * dL_dalpha;
+//			float opac = sigmoid_s(con_o.w, s);
+//            float ldd = ldd_s(con_o.w, s);
+//            atomicAdd(&(dL_dsd[global_id]), dl_dopaci * (-ldd / last_opac));  // dl_dopacity * dopacity_dsd
+//
+//            // Update gradients w.r.t. SDF of the last Gaussian
+//            if (last_global_id != -1) {
+//                float last_ldd = ldd_s(last_sdf, s);
+//                atomicAdd(&(dL_dsd[last_global_id]), last_dl_dopaci * (opac * last_ldd / last_opac / last_opac));  // dl_dopacity * dopacity_dsd
+//
+//                atomicAdd(&(dL_dsp[0]), dl_dopaci * ((-ldd * last_opac + last_ldd * opac) / last_opac / last_opac));  // dl_dopacity * dopacity_dsp
+//            }
+
+
+			last_global_id = global_id;
+			last_dl_dopaci = dl_dopaci;
+			last_opac = opac;
+			last_sdf = con_o.w;
 		}
 	}
 }
@@ -658,7 +700,10 @@ void BACKWARD::render(
 	float3* dL_dmean2D,
 	float4* dL_dconic2D,
 	float* dL_dopacity,
-	float* dL_dcolors)
+	float* dL_dcolors,
+	float* dL_dsd,
+	float* dL_dsp,
+	float s)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> >(
 		ranges,
@@ -676,6 +721,9 @@ void BACKWARD::render(
 		dL_dmean2D,
 		dL_dconic2D,
 		dL_dopacity,
-		dL_dcolors
+		dL_dcolors,
+		dL_dsd,
+		dL_dsp,
+		s
 		);
 }

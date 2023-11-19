@@ -273,9 +273,13 @@ renderCUDA(
 		const float* __restrict__ bg_color,
 		float* __restrict__ out_color,
 		float* __restrict__ out_depth,
-		float* __restrict__ depth2,
-		float* __restrict__ alphas,
-		float* __restrict__ depths3)
+//		float* __restrict__ depth2,
+		float* __restrict__ depth3,
+		float* __restrict__ probs2,
+		float* __restrict__ color2,
+		float* __restrict__ opac2,
+		float s
+		)
 {
 	// Identify current tile and associated min/max pixel range.
 	auto block = cg::this_thread_block();
@@ -306,12 +310,14 @@ renderCUDA(
 	uint32_t contributor = 0;
 	uint32_t last_contributor = 0;
 	float C[CHANNELS] = { 0 };
-	float D = 0.0f;
+//	float D = 0.0f;
 	float W_sum = 0.0f;
-//	const int N = 350;
-//	float Aj[N] = { 0 };
-//	float Dj[N] = { 0 };
-//	int jidx = 0;
+	const int N = 64;
+	float Dj[N] = { 0 };
+	float Pj[N] = { 0 };
+	float Oj[N] = { 0 };
+	float Cj[N][3] = { 0 };
+	int jidx = 0;
 
 	// Iterate over batches until all done or range is complete
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -335,10 +341,15 @@ renderCUDA(
 		// Iterate over current batch
 		for (int j = 0; !done && j < min(BLOCK_SIZE, toDo); j++)
 		{
+			if (jidx >= N) {
+				done = true;
+				continue;
+			}
+
 			// Keep track of current position in range
 			contributor++;
 
-			// Resample using conic matrix (cf. "Surface 
+			// Resample using conic matrix (cf. "Surface
 			// Splatting" by Zwicker et al., 2001)
 			float2 xy = collected_xy[j];
 			float2 d = { xy.x - pixf.x, xy.y - pixf.y };
@@ -347,11 +358,25 @@ renderCUDA(
 			if (power > 0.0f)
 				continue;
 
+			Pj[jidx] = exp(power);
+			Oj[jidx] = con_o.w;
+			for (int ch = 0; ch < CHANNELS; ch++) {
+				Cj[jidx][ch] = features[collected_id[j] * CHANNELS + ch];
+			}
+//			if (jidx == 0){
+//				++jidx;
+//				continue;
+//			}
+
 			// Eq. (2) from 3D Gaussian splatting paper.
 			// Obtain alpha by multiplying with Gaussian opacity
 			// and its exponential falloff from mean.
-			// Avoid numerical instabilities (see paper appendix). 
-			float alpha = min(0.99f, con_o.w * exp(power));
+			// Avoid numerical instabilities (see paper appendix).
+//            float sdf_opac = 1.0f-(sigmoid_s(con_o.w, s) / sigmoid_s(Oj[jidx-1], s));
+//			float sdf_opac = Oj[jidx];
+            float sdf_opac = max(0.0f, ldd_s(Oj[jidx], s) / sigmoid_s(Oj[jidx], s) / s);
+			float alpha = min(0.99f, sdf_opac * Pj[jidx]);
+            Dj[jidx] = alpha;
 			if (alpha < 1.0f / 255.0f)
 				continue;
 			float test_T = T * (1 - alpha);
@@ -362,19 +387,36 @@ renderCUDA(
 			}
 
 			// Eq. (3) from 3D Gaussian splatting paper.
-			for (int ch = 0; ch < CHANNELS; ch++)
-				C[ch] += features[collected_id[j] * CHANNELS + ch] * alpha * T;
-			D += depths[collected_id[j]] * alpha * T;
+			for (int ch = 0; ch < CHANNELS; ch++) {
+				C[ch] += Cj[jidx][ch] * alpha * T;
+			}
 			W_sum += alpha * T;
-//			Aj[jidx] = alpha;
-//			Dj[jidx++] = depths[collected_id[j]];
-
 			T = test_T;
 
 			// Keep track of last range entry to update this pixel.
-			last_contributor = contributor;
+			last_contributor = contributor-1;
+			++jidx;
 		}
 	}
+
+//	float T = 1.0f;
+//	for (int i = 0; i < N - 1 && Pj[i + 1] != -1; ++i){
+////		Oj[i] = 1.0f-(sigmoid_s2(Oj[i+1], s)/sigmoid_s2(Oj[i], s));
+//
+//		float alpha = min(0.99f, Oj[i] * Pj[i]);
+//		if (alpha < 1.0f / 255.0f)
+//			continue;
+//		float test_T = T * (1 - alpha);
+//		if (test_T < 0.0001f)
+//			break;
+//
+//		for (int ch = 0; ch < CHANNELS; ch++) {
+//			C[ch] += Cj[i][ch] * alpha * T;
+//		}
+//		W_sum += alpha * T;
+//
+//		T = test_T;
+//	}
 
 	// All threads that treat valid pixel write out their final
 	// rendering data to the frame and auxiliary buffers.
@@ -385,39 +427,15 @@ renderCUDA(
 		for (int ch = 0; ch < CHANNELS; ch++)
 			out_color[ch * H * W + pix_id] = C[ch] + T * bg_color[ch];
 		out_depth[pix_id] = W_sum;
-		depth2[pix_id] = D;
+//		depth2[pix_id] = D;
 
-//		float maxA = 0.0f;
-//		int maxIdx = -1;
-//		for (int g = 0; g < N; ++g) {
-//            if (Aj[g] > maxA) {
-//                maxA = Aj[g];
-//                maxIdx = g;
-//            }
-//        }
-//        if (maxIdx != -1) {
-//            const float thresh = 0.1;
-//
-//            int start = maxIdx, end = maxIdx;
-//            while (start >= 0 && Dj[start] > (Dj[maxIdx] - thresh)) --start;
-//            while (end < N && Dj[end] < (Dj[maxIdx] + thresh)) ++end;
-//
-//            float T = 1.0f;
-//			float D2 = 0.0f;
-//            float weightSum = 0.0f;
-//            for (int g = start + 1; g < end; ++g) {
-//                D2 += Dj[g] * Aj[g] * T;
-//                weightSum += Aj[g] * T;
-//                T *= (1 - Aj[g]);
-//            }
-//            if (weightSum > 0.99) depth2[pix_id] = D2;
-//            else depth2[pix_id] = 0.0f;
-//        }
-
-//		for (int g = 0; g < N; g++) {
-//			alphas[g * H * W + pix_id] = Aj[g];
-//			depths3[g * H * W + pix_id] = Dj[g];
-//	    }
+		for (int g = 0; g < N; g++) {  // Just cut off anything past. Behavior like vector resize operation in c++
+			depth3[g * H * W + pix_id] = Dj[g];
+			probs2[g * H * W + pix_id] = Pj[g];
+			opac2[g * H * W + pix_id] = Oj[g];
+			for (int ch = 0; ch < CHANNELS; ch++)
+				color2[(ch * N + g) * H * W + pix_id] = Cj[g][ch];
+	    }
 	}
 }
 
@@ -435,9 +453,12 @@ void FORWARD::render(
 		const float* bg_color,
 		float* out_color,
 		float* out_depth,
-		float* depth2,
-		float* alphas,
-		float* depths3)
+//		float* depth2,
+		float* depth3,
+		float* probs2,
+		float* color2,
+		float* opac2,
+		float s)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
 			ranges,
@@ -452,9 +473,12 @@ void FORWARD::render(
 					bg_color,
 					out_color,
 					out_depth,
-					depth2,
-					alphas,
-					depths3);
+//					depth2,
+					depth3,
+					probs2,
+					color2,
+					opac2,
+					s);
 }
 
 void FORWARD::preprocess(int P, int D, int M,
