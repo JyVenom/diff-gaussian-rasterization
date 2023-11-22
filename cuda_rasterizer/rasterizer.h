@@ -55,7 +55,7 @@ namespace CudaRasterizer
 			float* probs2,
 			float* color2,
 			float* opac2,
-			const float s,
+            float* alpha2,
 			int* radii = nullptr,
 			bool debug = false);
 
@@ -89,9 +89,7 @@ namespace CudaRasterizer
 			float* dL_dsh,
 			float* dL_dscale,
 			float* dL_drot,
-			float* dL_dsd,
-			float* dL_dsp,
-			const float s,
+			float* dL_dsigma,
 			bool debug);
 	};
 };

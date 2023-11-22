@@ -67,7 +67,7 @@ namespace FORWARD
 		float* probs2,
 		float* color2,
 		float* opac2,
-		float s);
+		float* alpha2);
 }
 
 

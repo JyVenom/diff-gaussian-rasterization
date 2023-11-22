@@ -221,8 +221,8 @@ int CudaRasterizer::Rasterizer::forward(
 	float* depth3,
 	float* probs2,
 	float* color2,
-	float* opac2,
-	const float s,
+    float* opac2,
+    float* alpha2,
 	int* radii,
 	bool debug)
 {
@@ -345,7 +345,7 @@ int CudaRasterizer::Rasterizer::forward(
 		probs2,
 		color2,
 		opac2,
-		s), debug)
+        alpha2), debug)
 
 	return num_rendered;
 }
@@ -382,9 +382,7 @@ void CudaRasterizer::Rasterizer::backward(
 	float* dL_dsh,
 	float* dL_dscale,
 	float* dL_drot,
-	float* dL_dsd,
-	float* dL_dsp,
-	const float s,
+	float* dL_dsigma,
 	bool debug)
 {
 	GeometryState geomState = GeometryState::fromChunk(geom_buffer, P);
@@ -426,9 +424,7 @@ void CudaRasterizer::Rasterizer::backward(
 		(float4*)dL_dconic,
 		dL_dopacity,
 		dL_dcolor,
-		dL_dsd,
-		dL_dsp,
-		s), debug)
+		dL_dsigma), debug)
 
 	// Take care of the rest of preprocessing. Was the precomputed covariance
 	// given to us or a scales/rot pair? If precomputed, pass that. If not,

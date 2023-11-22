@@ -140,9 +140,9 @@ __forceinline__ __device__ float sigmoid_s(float sdf, float s){
 	return 1.0f / (1.0f + expf(-sdf*s));
 }
 
-__forceinline__ __device__ float ldd_s(float sdf, float s){
+__forceinline__ __device__ float logistic_s(float sdf, float s){
 	float sig = sigmoid_s(sdf, s);
-	return s * sig * (1 - sig);
+	return s * sig * (1.0f - sig);
 }
 
 __forceinline__ __device__ bool in_frustum(int idx,

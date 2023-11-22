@@ -415,9 +415,7 @@ renderCUDA(
 	float4* __restrict__ dL_dconic2D,
 	float* __restrict__ dL_dopacity,
 	float* __restrict__ dL_dcolors,
-	float* __restrict__ dL_dsd,
-	float* __restrict__ dL_dsp,
-	float s)
+	float* __restrict__ dL_dsigma)
 {
 	// We rasterize again. Compute necessary block info.
 	auto block = cg::this_thread_block();
@@ -470,10 +468,7 @@ renderCUDA(
 	const float ddelx_dx = 0.5 * W;
 	const float ddely_dy = 0.5 * H;
 
-	int last_global_id = -1;
-	float last_dl_dopaci = 0;
-	float last_opac = 0;
-	float last_sdf = 0;
+	float prev_depth = -1;
 
 	// Traverse all Gaussians
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -512,108 +507,83 @@ renderCUDA(
 			if (power > 0.0f)
 				continue;
 
-			const float G = exp(power);
-			const float alpha = min(0.99f, con_o.w * G);
-			if (alpha < 1.0f / 255.0f)
-				continue;
+			if (prev_depth != -1) {
+				const float G = exp(power);
+				float delta = prev_depth - collected_depths[j];
+				float alpha = 1.0f - expf(-con_o.w * delta);
+				alpha = alpha * G;
+				alpha = min(0.99f, alpha);
+//			const float alpha = min(0.99f, con_o.w * G);
+//			if (alpha < 1.0f / 255.0f)
+//				continue;
 
-			T = T / (1.f - alpha);
-			const float dchannel_dcolor = alpha * T;
+				T = T / (1.f - alpha);
+				const float dchannel_dcolor = alpha * T;
 
-			// Propagate gradients to per-Gaussian colors and keep
-			// gradients w.r.t. alpha (blending factor for a Gaussian/pixel
-			// pair).
-			float dL_dalpha = 0.0f;
-			const int global_id = collected_id[j];
-			for (int ch = 0; ch < C; ch++)
-			{
-				const float c = collected_colors[ch * BLOCK_SIZE + j];
-				// Update last color (to be used in the next iteration)
-				accum_rec[ch] = last_alpha * last_color[ch] + (1.f - last_alpha) * accum_rec[ch];
-				last_color[ch] = c;
+				// Propagate gradients to per-Gaussian colors and keep
+				// gradients w.r.t. alpha (blending factor for a Gaussian/pixel
+				// pair).
+				float dL_dalpha = 0.0f;
+				const int global_id = collected_id[j];
+				for (int ch = 0; ch < C; ch++) {
+					const float c = collected_colors[ch * BLOCK_SIZE + j];
+					// Update last color (to be used in the next iteration)
+					accum_rec[ch] = last_alpha * last_color[ch] + (1.f - last_alpha) * accum_rec[ch];
+					last_color[ch] = c;
 
-				const float dL_dchannel = dL_dpixel[ch];
-				dL_dalpha += (c - accum_rec[ch]) * dL_dchannel;
-				// Update the gradients w.r.t. color of the Gaussian. 
-				// Atomic, since this pixel is just one of potentially
-				// many that were affected by this Gaussian.
-				atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_dchannel);
+					const float dL_dchannel = dL_dpixel[ch];
+					dL_dalpha += (c - accum_rec[ch]) * dL_dchannel;
+					// Update the gradients w.r.t. color of the Gaussian.
+					// Atomic, since this pixel is just one of potentially
+					// many that were affected by this Gaussian.
+					atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_dchannel);
+				}
+
+				// Propagate gradients to per-Gaussian depths
+				const float c_d = collected_depths[j];
+				accum_depth_rec = last_alpha * last_depth + (1.f - last_alpha) * accum_depth_rec;
+				last_depth = c_d;
+				dL_dalpha += (c_d - accum_depth_rec) * dL_depth;
+				// for (int ch = 0; ch < C; ch++)
+				// {
+				// 	atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_depth);
+				// }
+
+				dL_dalpha *= T;
+				// Update last alpha (to be used in the next iteration)
+				last_alpha = alpha;
+
+				// Account for fact that alpha also influences how much of
+				// the background color is added if nothing left to blend
+				float bg_dot_dpixel = 0;
+				for (int i = 0; i < C; i++)
+					bg_dot_dpixel += bg_color[i] * dL_dpixel[i];
+				dL_dalpha += (-T_final / (1.f - alpha)) * bg_dot_dpixel;
+
+
+				// Helpful reusable temporary variables
+				const float dL_dG = con_o.w * dL_dalpha;
+				const float gdx = G * d.x;
+				const float gdy = G * d.y;
+				const float dG_ddelx = -gdx * con_o.x - gdy * con_o.y;
+				const float dG_ddely = -gdy * con_o.z - gdx * con_o.y;
+
+				// Update gradients w.r.t. 2D mean position of the Gaussian
+				atomicAdd(&dL_dmean2D[global_id].x, dL_dG * dG_ddelx * ddelx_dx);
+				atomicAdd(&dL_dmean2D[global_id].y, dL_dG * dG_ddely * ddely_dy);
+
+				// Update gradients w.r.t. 2D covariance (2x2 matrix, symmetric)
+				atomicAdd(&dL_dconic2D[global_id].x, -0.5f * gdx * d.x * dL_dG);
+				atomicAdd(&dL_dconic2D[global_id].y, -0.5f * gdx * d.y * dL_dG);
+				atomicAdd(&dL_dconic2D[global_id].w, -0.5f * gdy * d.y * dL_dG);
+
+				// Update gradients w.r.t. opacity of the Gaussian
+				atomicAdd(&(dL_dopacity[global_id]), G * dL_dalpha);
+
+				// Update gradients w.r.t. sigma of the Gaussian
+				atomicAdd(&(dL_dsigma[global_id]), G * dL_dalpha * delta * expf(-con_o.w * delta));  // dl_dopacity * dopacity_dsigma
 			}
-
-			// Propagate gradients to per-Gaussian depths
-			const float c_d = collected_depths[j];
-			accum_depth_rec = last_alpha * last_depth + (1.f - last_alpha) * accum_depth_rec;
-			last_depth = c_d;
-			dL_dalpha += (c_d - accum_depth_rec) * dL_depth;
-			// for (int ch = 0; ch < C; ch++)
-			// {
-			// 	atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_depth);
-			// }
-
-			dL_dalpha *= T;
-			// Update last alpha (to be used in the next iteration)
-			last_alpha = alpha;
-
-			// Account for fact that alpha also influences how much of
-			// the background color is added if nothing left to blend
-			float bg_dot_dpixel = 0;
-			for (int i = 0; i < C; i++)
-				bg_dot_dpixel += bg_color[i] * dL_dpixel[i];
-			dL_dalpha += (-T_final / (1.f - alpha)) * bg_dot_dpixel;
-
-
-			// Helpful reusable temporary variables
-			const float dL_dG = con_o.w * dL_dalpha;
-			const float gdx = G * d.x;
-			const float gdy = G * d.y;
-			const float dG_ddelx = -gdx * con_o.x - gdy * con_o.y;
-			const float dG_ddely = -gdy * con_o.z - gdx * con_o.y;
-
-			// Update gradients w.r.t. 2D mean position of the Gaussian
-			atomicAdd(&dL_dmean2D[global_id].x, dL_dG * dG_ddelx * ddelx_dx);
-			atomicAdd(&dL_dmean2D[global_id].y, dL_dG * dG_ddely * ddely_dy);
-
-			// Update gradients w.r.t. 2D covariance (2x2 matrix, symmetric)
-			atomicAdd(&dL_dconic2D[global_id].x, -0.5f * gdx * d.x * dL_dG);
-			atomicAdd(&dL_dconic2D[global_id].y, -0.5f * gdx * d.y * dL_dG);
-			atomicAdd(&dL_dconic2D[global_id].w, -0.5f * gdy * d.y * dL_dG);
-
-			// Update gradients w.r.t. opacity of the Gaussian
-			atomicAdd(&(dL_dopacity[global_id]), G * dL_dalpha);
-
-			// Update gradients w.r.t. SDF of the Gaussian
-			float dl_dopaci = G * dL_dalpha;
-			float opac = sigmoid_s(con_o.w, s);
-			float ldd = ldd_s(con_o.w, s);
-			atomicAdd(&(dL_dsd[global_id]), dl_dopaci * (last_opac * ldd / opac / opac));  // dl_dopacity * dopacity_dsd
-
-			// Update gradients w.r.t. SDF of the last Gaussian
-			if (last_global_id != -1) {
-				float last_ldd = ldd_s(last_sdf, s);
-				atomicAdd(&(dL_dsd[last_global_id]), last_dl_dopaci * (-last_ldd / opac));  // dl_dopacity * dopacity_dsd
-
-				atomicAdd(&(dL_dsp[0]), dl_dopaci * ((-last_ldd * opac + ldd * last_opac) / opac / opac));  // dl_dopacity * dopacity_dsp
-			}
-
-//            // Update gradients w.r.t. SDF of the Gaussian
-//            float dl_dopaci = G * dL_dalpha;
-//			float opac = sigmoid_s(con_o.w, s);
-//            float ldd = ldd_s(con_o.w, s);
-//            atomicAdd(&(dL_dsd[global_id]), dl_dopaci * (-ldd / last_opac));  // dl_dopacity * dopacity_dsd
-//
-//            // Update gradients w.r.t. SDF of the last Gaussian
-//            if (last_global_id != -1) {
-//                float last_ldd = ldd_s(last_sdf, s);
-//                atomicAdd(&(dL_dsd[last_global_id]), last_dl_dopaci * (opac * last_ldd / last_opac / last_opac));  // dl_dopacity * dopacity_dsd
-//
-//                atomicAdd(&(dL_dsp[0]), dl_dopaci * ((-ldd * last_opac + last_ldd * opac) / last_opac / last_opac));  // dl_dopacity * dopacity_dsp
-//            }
-
-
-			last_global_id = global_id;
-			last_dl_dopaci = dl_dopaci;
-			last_opac = opac;
-			last_sdf = con_o.w;
+			prev_depth = collected_depths[j];
 		}
 	}
 }
@@ -701,9 +671,7 @@ void BACKWARD::render(
 	float4* dL_dconic2D,
 	float* dL_dopacity,
 	float* dL_dcolors,
-	float* dL_dsd,
-	float* dL_dsp,
-	float s)
+	float* dL_dsigma)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> >(
 		ranges,
@@ -722,8 +690,6 @@ void BACKWARD::render(
 		dL_dconic2D,
 		dL_dopacity,
 		dL_dcolors,
-		dL_dsd,
-		dL_dsp,
-		s
+		dL_dsigma
 		);
 }
