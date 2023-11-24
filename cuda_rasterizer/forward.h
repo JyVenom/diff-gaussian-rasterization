@@ -71,8 +71,7 @@ namespace FORWARD
 		float* color2,
 		float* opac2,
 		float* alpha2,
-		float* psdf2,
-		const bool dump_data);
+		float* psdf2);
 }
 
 
