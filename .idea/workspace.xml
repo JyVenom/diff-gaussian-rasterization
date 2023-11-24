@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="CMakePresetLoader">{
+  &quot;useNewFormat&quot;: true
+}</component>
+  <component name="CMakeReloadState">
+    <option name="reloaded" value="true" />
+  </component>
+  <component name="CMakeRunConfigurationManager">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" ENABLED="true" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="8f783afc-f17f-4c33-89b8-7b86bf9503f3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/../../.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../arguments/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../arguments/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000000.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000002.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000003.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000004.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000005.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000006.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000007.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000008.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000009.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000010.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000011.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000012.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000013.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000014.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000015.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000016.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000017.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000018.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000019.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000020.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000021.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000022.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000023.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000025.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000026.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000027.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000028.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000029.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000030.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000031.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000032.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000033.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000034.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000035.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000036.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000037.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000038.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000039.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000040.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000041.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000042.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000044.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000045.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000046.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000047.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/images/000048.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/000.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/001.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/002.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/003.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/004.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/005.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/006.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/007.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/008.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/009.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/010.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/011.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/012.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/013.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/014.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/015.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/016.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/017.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/018.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/019.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/020.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/021.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/022.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/023.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/024.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/025.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/026.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/027.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/028.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/029.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/030.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/031.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/032.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/033.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/034.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/035.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/036.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/037.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/038.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/039.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/040.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/041.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/042.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/043.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/044.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/045.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/046.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/047.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/masks/048.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/sparse/0/cameras.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/sparse/0/images.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/sparse/0/points3D.bin" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/sparse/0/points3D.ply" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../data/dtu/dtu_scan24/sparse/0/project.ini" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../jerry_out/est_mask.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../jerry_out/spsr_mesh.ply" beforeDir="false" afterPath="$PROJECT_DIR$/../../jerry_out/spsr_mesh.ply" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../scene/dataset_readers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../scene/dataset_readers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../scene/gaussian_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../scene/gaussian_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../utils/loss_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../utils/loss_utils.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
+  </component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2023" />
+    <option name="minorVersion" value="2.2" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2Vgw5SjakA4KzdyhzlQvMiAfUEA" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Jerry/Code/Python/gaussian-splatting/submodules/diff-gaussian-rasterization&quot;
+  }
+}</component>
+  <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu</url>
+          <line>284</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

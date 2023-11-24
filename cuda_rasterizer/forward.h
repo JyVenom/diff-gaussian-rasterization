@@ -57,6 +57,7 @@ namespace FORWARD
 		int W, int H,
 		const float2* points_xy_image,
 		const float* features,
+		const float* depths,
 		const float4* conic_opacity,
 		const float* psdfs,
 		float* final_T,
@@ -70,7 +71,8 @@ namespace FORWARD
 		float* color2,
 		float* opac2,
 		float* alpha2,
-		float* psdf2);
+		float* psdf2,
+		const bool dump_data);
 }
 
 
