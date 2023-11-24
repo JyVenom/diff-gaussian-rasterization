@@ -129,12 +129,6 @@
       <change beforePath="$PROJECT_DIR$/../../jerry_out/spsr_mesh.ply" beforeDir="false" afterPath="$PROJECT_DIR$/../../jerry_out/spsr_mesh.ply" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../scene/dataset_readers.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../scene/dataset_readers.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../scene/gaussian_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../scene/gaussian_model.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/lib.win-amd64-cpython-310/diff_gaussian_rasterization/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib.win-amd64-cpython-310/diff_gaussian_rasterization/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/diff_gaussian_rasterization/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../train.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../utils/loss_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../utils/loss_utils.py" afterDir="false" />
     </list>
