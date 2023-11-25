@@ -19,13 +19,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f783afc-f17f-4c33-89b8-7b86bf9503f3" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_003000.pth" beforeDir="false" afterPath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_003000.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_010000.pth" beforeDir="false" afterPath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_010000.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_300000.pth" beforeDir="false" afterPath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_300000.pth" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rasterize_points.cu" beforeDir="false" afterPath="$PROJECT_DIR$/rasterize_points.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
