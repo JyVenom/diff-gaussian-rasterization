@@ -317,14 +317,14 @@ renderCUDA(
 	float C[CHANNELS] = { 0 };
 //	float D = 0.0f;
 	float W_sum = 0.0f;
-//	const int N = 1;
-//	float Dj[N] = { 0 };
-//	float Sj[N] = { 0 };
-//	float Pj[N] = { 0 };
-//	float Oj[N] = { 0 };
-//	float Aj[N] = { 0 };
-////	float Cj[N][3] = { 0 };
-//	int jidx = 0;
+	const int N = 100;
+	float Dj[N] = { 0 };
+	float Sj[N] = { 0 };
+	float Pj[N] = { 0 };
+	float Oj[N] = { 0 };
+	float Aj[N] = { 0 };
+//	float Cj[N][3] = { 0 };
+	int jidx = 0;
 
 	// Iterate over batches until all done or range is complete
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -373,12 +373,14 @@ renderCUDA(
 			if (alpha < 1.0f / 255.0f)
 				continue;
 
-//            Pj[jidx] = exp(power);
-//            Oj[jidx] = con_o.w;
-//            Dj[jidx] = depths[collected_id[j]];
-//            Sj[jidx] = psdfs[collected_id[j]];
-//            Aj[jidx] = alpha;
-//            ++jidx;
+			if (jidx < N) {
+				Pj[jidx] = exp(power);
+				Oj[jidx] = con_o.w;
+				Dj[jidx] = depths[collected_id[j]];
+				Sj[jidx] = psdfs[collected_id[j]];
+				Aj[jidx] = alpha;
+				++jidx;
+			}
 
 			// Eq. (3) from 3D Gaussian splatting paper.
 			for (int ch = 0; ch < CHANNELS; ch++) {
@@ -403,15 +405,15 @@ renderCUDA(
 		out_depth[pix_id] = W_sum;
 //		depth2[pix_id] = D;
 
-//        for (int g = 0; g < N; g++) {  // Just cut off anything past. Behavior like vector resize operation in c++
-//            depth3[g * H * W + pix_id] = Dj[g];
-//            psdf2[g * H * W + pix_id] = Sj[g];
-//            probs2[g * H * W + pix_id] = Pj[g];
-//            opac2[g * H * W + pix_id] = Oj[g];
-//            alpha2[g * H * W + pix_id] = Aj[g];
-////			for (int ch = 0; ch < CHANNELS; ch++)
-////				color2[(ch * N + g) * H * W + pix_id] = Cj[g][ch];
-//        }
+        for (int g = 0; g < N; g++) {  // Just cut off anything past. Behavior like vector resize operation in c++
+            depth3[g * H * W + pix_id] = Dj[g];
+            psdf2[g * H * W + pix_id] = Sj[g];
+            probs2[g * H * W + pix_id] = Pj[g];
+            opac2[g * H * W + pix_id] = Oj[g];
+            alpha2[g * H * W + pix_id] = Aj[g];
+//			for (int ch = 0; ch < CHANNELS; ch++)
+//				color2[(ch * N + g) * H * W + pix_id] = Cj[g][ch];
+        }
 	}
 }
 
