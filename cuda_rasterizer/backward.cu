@@ -405,18 +405,15 @@ renderCUDA(
 	const float* __restrict__ bg_color,
 	const float2* __restrict__ points_xy_image,
 	const float4* __restrict__ conic_opacity,
-	const float* __restrict__ psdfs,
 	const float* __restrict__ colors,
-	const float* __restrict__ depths,
 	const float* __restrict__ final_Ts,
 	const uint32_t* __restrict__ n_contrib,
 	const float* __restrict__ dL_dpixels,
-	const float* __restrict__ dL_depths,
+	const float* __restrict__ dl_masks,
 	float3* __restrict__ dL_dmean2D,
 	float4* __restrict__ dL_dconic2D,
 	float* __restrict__ dL_dopacity,
-	float* __restrict__ dL_dcolors,
-	float* __restrict__ dL_dpsdf)
+	float* __restrict__ dL_dcolors)
 {
 	// We rasterize again. Compute necessary block info.
 	auto block = cg::this_thread_block();
@@ -439,8 +436,6 @@ renderCUDA(
 	__shared__ float2 collected_xy[BLOCK_SIZE];
 	__shared__ float4 collected_conic_opacity[BLOCK_SIZE];
 	__shared__ float collected_colors[C * BLOCK_SIZE];
-	__shared__ float collected_depths[BLOCK_SIZE];
-	__shared__ float collected_psdfs[BLOCK_SIZE];
 
 	// In the forward, we stored the final value for T, the
 	// product of all (1 - alpha) factors. 
@@ -454,16 +449,15 @@ renderCUDA(
 
 	float accum_rec[C] = { 0 };
 	float dL_dpixel[C];
-	float dL_depth;
-	float accum_depth_rec = 0;
+	float dL_mask;
+	float accum_mask_rec = 0;
 	if (inside)
 		for (int i = 0; i < C; i++)
 			dL_dpixel[i] = dL_dpixels[i * H * W + pix_id];
-		dL_depth = dL_depths[pix_id];
+		dL_mask = dl_masks[pix_id];
 
 	float last_alpha = 0;
 	float last_color[C] = { 0 };
-	float last_depth = 0;
 
 	// Gradient of pixel coordinate w.r.t. normalized 
 	// screen-space viewport corrdinates (-1 to 1)
@@ -485,9 +479,6 @@ renderCUDA(
 			collected_conic_opacity[block.thread_rank()] = conic_opacity[coll_id];
 			for (int i = 0; i < C; i++)
 				collected_colors[i * BLOCK_SIZE + block.thread_rank()] = colors[coll_id * C + i];
-//			collected_depths[block.thread_rank()] = depths[coll_id];
-			collected_depths[block.thread_rank()] = 1.0;
-			collected_psdfs[block.thread_rank()] = psdfs[coll_id];
 		}
 		block.sync();
 
@@ -509,8 +500,7 @@ renderCUDA(
 				continue;
 
 			const float G = exp(power);
-			const float psdf = collected_psdfs[j];
-			const float alpha = min(0.99f, con_o.w * G * psdf);
+			const float alpha = min(0.99f, con_o.w * G);
 			if (alpha < 1.0f / 255.0f)
 				continue;
 
@@ -537,11 +527,9 @@ renderCUDA(
 				atomicAdd(&(dL_dcolors[global_id * C + ch]), dchannel_dcolor * dL_dchannel);
 			}
 
-			// Propagate gradients to per-Gaussian depths
-			const float c_d = collected_depths[j];
-			accum_depth_rec = last_alpha * last_depth + (1.f - last_alpha) * accum_depth_rec;
-			last_depth = c_d;
-			dL_dalpha += (c_d - accum_depth_rec) * dL_depth;
+			// Propagate gradients to per-Gaussian masks
+			accum_mask_rec = last_alpha + (1.f - last_alpha) * accum_mask_rec;
+			dL_dalpha += (1.0f - accum_mask_rec) * dL_mask;
 
 			dL_dalpha *= T;
 			// Update last alpha (to be used in the next iteration)
@@ -556,7 +544,7 @@ renderCUDA(
 
 
 			// Helpful reusable temporary variables
-			const float dL_dG = con_o.w * dL_dalpha * psdf;
+			const float dL_dG = con_o.w * dL_dalpha;
 			const float gdx = G * d.x;
 			const float gdy = G * d.y;
 			const float dG_ddelx = -gdx * con_o.x - gdy * con_o.y;
@@ -572,10 +560,7 @@ renderCUDA(
 			atomicAdd(&dL_dconic2D[global_id].w, -0.5f * gdy * d.y * dL_dG);
 
 			// Update gradients w.r.t. opacity of the Gaussian
-			atomicAdd(&(dL_dopacity[global_id]), G * dL_dalpha * psdf);
-
-			// Update gradients w.r.t. sigma of the Gaussian
-			atomicAdd(&(dL_dpsdf[global_id]), G * dL_dalpha * con_o.w);
+			atomicAdd(&(dL_dopacity[global_id]), G * dL_dalpha);
 		}
 	}
 }
@@ -653,18 +638,15 @@ void BACKWARD::render(
 	const float* bg_color,
 	const float2* means2D,
 	const float4* conic_opacity,
-	const float* psdfs,
 	const float* colors,
-	const float* depths,
 	const float* final_Ts,
 	const uint32_t* n_contrib,
 	const float* dL_dpixels,
-	const float* dL_depths,
+	const float* dl_masks,
 	float3* dL_dmean2D,
 	float4* dL_dconic2D,
 	float* dL_dopacity,
-	float* dL_dcolors,
-	float* dL_dpsdf)
+	float* dL_dcolors)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> >(
 		ranges,
@@ -673,17 +655,14 @@ void BACKWARD::render(
 		bg_color,
 		means2D,
 		conic_opacity,
-		psdfs,
 		colors,
-		depths,
 		final_Ts,
 		n_contrib,
 		dL_dpixels,
-		dL_depths,
+		dl_masks,
 		dL_dmean2D,
 		dL_dconic2D,
 		dL_dopacity,
-		dL_dcolors,
-		dL_dpsdf
+		dL_dcolors
 		);
 }

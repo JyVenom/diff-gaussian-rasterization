@@ -159,7 +159,6 @@ __global__ void preprocessCUDA(int P, int D, int M,
 							   const float scale_modifier,
 							   const glm::vec4* rotations,
 							   const float* opacities,
-							   const float* psdf,
 							   const float* shs,
 							   bool* clamped,
 							   const float* cov3D_precomp,
@@ -176,7 +175,6 @@ __global__ void preprocessCUDA(int P, int D, int M,
 							   float* cov3Ds,
 							   float* rgb,
 							   float4* conic_opacity,
-							   float* psdfs,
 							   const dim3 grid,
 							   uint32_t* tiles_touched,
 							   bool prefiltered)
@@ -254,7 +252,6 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	points_xy_image[idx] = point_image;
 	// Inverse 2D covariance and opacity neatly pack into one float4
 	conic_opacity[idx] = { conic.x, conic.y, conic.z, opacities[idx] };
-	psdfs[idx] = psdf[idx];
 	tiles_touched[idx] = (rect_max.y - rect_min.y) * (rect_max.x - rect_min.x);
 }
 
@@ -271,19 +268,17 @@ renderCUDA(
 		const float* __restrict__ features,
 		const float* __restrict__ depths,
 		const float4* __restrict__ conic_opacity,
-		const float* __restrict__ psdfs,
 		float* __restrict__ final_T,
 		uint32_t* __restrict__ n_contrib,
 		const float* __restrict__ bg_color,
 		float* __restrict__ out_color,
+		float* __restrict__ out_mask,
 		float* __restrict__ out_depth,
-//		float* __restrict__ depth2,
-		float* __restrict__ depth3,
+		float* __restrict__ depth2,
 		float* __restrict__ probs2,
 		float* __restrict__ color2,
         float* __restrict__ opac2,
-		float* __restrict__ alpha2,
-		float* __restrict__ psdf2
+		float* __restrict__ alpha2
 		)
 {
 	// Identify current tile and associated min/max pixel range.
@@ -315,7 +310,7 @@ renderCUDA(
 	uint32_t contributor = 0;
 	uint32_t last_contributor = 0;
 	float C[CHANNELS] = { 0 };
-//	float D = 0.0f;
+	float D = 0.0f;
 	float W_sum = 0.0f;
 	const int N = 100;
 	float Dj[N] = { 0 };
@@ -369,7 +364,7 @@ renderCUDA(
 			// Obtain alpha by multiplying with Gaussian opacity
 			// and its exponential falloff from mean.
 			// Avoid numerical instabilities (see paper appendix).
-			float alpha = min(0.99f, con_o.w * exp(power) * psdfs[collected_id[j]]);
+			float alpha = min(0.99f, con_o.w * exp(power));
 			if (alpha < 1.0f / 255.0f)
 				continue;
 
@@ -377,7 +372,6 @@ renderCUDA(
 				Pj[jidx] = exp(power);
 				Oj[jidx] = con_o.w;
 				Dj[jidx] = depths[collected_id[j]];
-				Sj[jidx] = psdfs[collected_id[j]];
 				Aj[jidx] = alpha;
 				++jidx;
 			}
@@ -386,6 +380,7 @@ renderCUDA(
 			for (int ch = 0; ch < CHANNELS; ch++) {
 				C[ch] += features[collected_id[j] * CHANNELS + ch] * alpha * T;
 			}
+            D += depths[collected_id[j]] * alpha * T;
 			W_sum += alpha * T;
 			T = T * (1 - alpha);
 
@@ -402,12 +397,11 @@ renderCUDA(
 		n_contrib[pix_id] = last_contributor;
 		for (int ch = 0; ch < CHANNELS; ch++)
 			out_color[ch * H * W + pix_id] = C[ch] + T * bg_color[ch];
-		out_depth[pix_id] = W_sum;
-//		depth2[pix_id] = D;
+		out_mask[pix_id] = W_sum;
+		out_depth[pix_id] = D;
 
         for (int g = 0; g < N; g++) {  // Just cut off anything past. Behavior like vector resize operation in c++
-            depth3[g * H * W + pix_id] = Dj[g];
-            psdf2[g * H * W + pix_id] = Sj[g];
+            depth2[g * H * W + pix_id] = Dj[g];
             probs2[g * H * W + pix_id] = Pj[g];
             opac2[g * H * W + pix_id] = Oj[g];
             alpha2[g * H * W + pix_id] = Aj[g];
@@ -426,19 +420,17 @@ void FORWARD::render(
 		const float* colors,
 		const float* depths,
 		const float4* conic_opacity,
-		const float* psdfs,
 		float* final_T,
 		uint32_t* n_contrib,
 		const float* bg_color,
 		float* out_color,
+		float* out_mask,
 		float* out_depth,
-//		float* depth2,
-		float* depth3,
+		float* depth2,
 		float* probs2,
 		float* color2,
 		float* opac2,
-		float* alpha2,
-		float* psdf2)
+		float* alpha2)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
 			ranges,
@@ -448,19 +440,17 @@ void FORWARD::render(
 					colors,
 					depths,
 					conic_opacity,
-					psdfs,
 					final_T,
 					n_contrib,
 					bg_color,
 					out_color,
+					out_mask,
 					out_depth,
-//					depth2,
-					depth3,
+					depth2,
 					probs2,
 					color2,
 					opac2,
-					alpha2,
-					psdf2);
+					alpha2);
 }
 
 void FORWARD::preprocess(int P, int D, int M,
@@ -469,7 +459,6 @@ void FORWARD::preprocess(int P, int D, int M,
 						 const float scale_modifier,
 						 const glm::vec4* rotations,
 						 const float* opacities,
-						 const float* psdf,
 						 const float* shs,
 						 bool* clamped,
 						 const float* cov3D_precomp,
@@ -486,7 +475,6 @@ void FORWARD::preprocess(int P, int D, int M,
 						 float* cov3Ds,
 						 float* rgb,
 						 float4* conic_opacity,
-						 float* psdfs,
 						 const dim3 grid,
 						 uint32_t* tiles_touched,
 						 bool prefiltered)
@@ -498,7 +486,6 @@ void FORWARD::preprocess(int P, int D, int M,
 					scale_modifier,
 					rotations,
 					opacities,
-					psdf,
 					shs,
 					clamped,
 					cov3D_precomp,
@@ -515,7 +502,6 @@ void FORWARD::preprocess(int P, int D, int M,
 					cov3Ds,
 					rgb,
 					conic_opacity,
-					psdfs,
 					grid,
 					tiles_touched,
 					prefiltered
