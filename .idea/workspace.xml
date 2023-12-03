@@ -19,6 +19,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f783afc-f17f-4c33-89b8-7b86bf9503f3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../NeuS/checkpoints/ckpt_010000.pth" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../NeuS/fields.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../NeuS/fields.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../train.py" afterDir="false" />
     </list>
@@ -59,7 +62,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu</url>
-          <line>284</line>
+          <line>289</line>
           <option name="timeStamp" value="2" />
         </line-breakpoint>
       </breakpoints>
