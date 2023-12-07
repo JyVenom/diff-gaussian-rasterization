@@ -61,13 +61,8 @@ namespace FORWARD
 		uint32_t* n_contrib,
 		const float* bg_color,
 		float* out_color,
-		float* out_mask,
 		float* out_depth,
-		float* depth2,
-		float* probs2,
-		float* color2,
-		float* opac2,
-		float* alpha2);
+		float* out_mask);
 }
 
 

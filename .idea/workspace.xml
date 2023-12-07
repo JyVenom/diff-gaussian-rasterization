@@ -19,20 +19,36 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f783afc-f17f-4c33-89b8-7b86bf9503f3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../NeuS/fields.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../NeuS/fields.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../arguments/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../arguments/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../jerry_debug/DenoisePCD.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../jerry_debug/DenoisePCD.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../jerry_out/spsr_mesh.ply" beforeDir="false" afterPath="$PROJECT_DIR$/../../jerry_out/spsr_mesh.ply" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build/lib.win-amd64-cpython-310/diff_gaussian_rasterization/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/build/lib.win-amd64-cpython-310/diff_gaussian_rasterization/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/build/lib.win-amd64-cpython-310/diff_gaussian_rasterization/__init__.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/3.26.4/CMakeSystem.cmake" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/3.26.4/CompilerIdCUDA/CMakeCUDACompilerId.cu" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/CMakeConfigureLog.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-Debug-log.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/clion-environment.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cmake-build-debug/CMakeFiles/cmake.check_cache" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/auxiliary.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/auxiliary.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/backward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/backward.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/backward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/backward.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization.egg-info/PKG-INFO" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization.egg-info/SOURCES.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization.egg-info/dependency_links.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization.egg-info/top_level.txt" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/diff_gaussian_rasterization/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rasterize_points.cu" beforeDir="false" afterPath="$PROJECT_DIR$/rasterize_points.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rasterize_points.h" beforeDir="false" afterPath="$PROJECT_DIR$/rasterize_points.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../utils/loss_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../utils/loss_utils.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,16 +81,11 @@
     &quot;last_opened_file_path&quot;: &quot;C:/Jerry/Code/Python/gaussian-splatting/submodules/diff-gaussian-rasterization&quot;
   }
 }</component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu</url>
-          <line>279</line>
-          <option name="timeStamp" value="2" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Jerry\Code\Python\gaussian-splatting\submodules\diff-gaussian-rasterization" />
+      <recent name="C:\Jerry\Code\Python\gaussian-splatting\submodules\diff-gaussian-rasterization\cuda_rasterizer" />
+    </key>
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
 </project>
