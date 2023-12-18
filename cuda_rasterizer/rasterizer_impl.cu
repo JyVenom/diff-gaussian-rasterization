@@ -218,6 +218,7 @@ int CudaRasterizer::Rasterizer::forward(
 	float* out_color,
 	float* out_depth,
 	float* out_mask,
+	float* ray_depths,
 	int* radii,
 	bool debug)
 {
@@ -335,7 +336,8 @@ int CudaRasterizer::Rasterizer::forward(
 		background,
 		out_color,
 		out_depth,
-		out_mask), debug)
+		out_mask,
+		ray_depths), debug)
 
 	return num_rendered;
 }
