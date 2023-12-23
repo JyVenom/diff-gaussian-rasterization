@@ -274,7 +274,8 @@ renderCUDA(
 	float* __restrict__ out_color,
 	float* __restrict__ out_depth,
 	float* __restrict__ out_mask,
-	float* __restrict__ ray_depths)
+	float* __restrict__ ray_depths,
+    float* __restrict__ ray_alphas)
 {
 	// Identify current tile and associated min/max pixel range.
 	auto block = cg::this_thread_block();
@@ -310,6 +311,7 @@ renderCUDA(
 
 	const int N = 32;
 	float ray_depth[N] = { 0 };
+    float ray_alpha[N] = { 0 };
 	int cnt = 0;
 
 	// Iterate over batches until all done or range is complete
@@ -366,7 +368,11 @@ renderCUDA(
 			D += depths[collected_id[j]] * alpha * T;
 			M += alpha * T;
 
-			if (cnt < N) ray_depth[cnt++] = depths[collected_id[j]];
+			if (cnt < N) {
+                ray_depth[cnt] = depths[collected_id[j]];
+                ray_alpha[cnt] = alpha;
+                ++cnt;
+            }
 
 			T = test_T;
 
@@ -387,8 +393,10 @@ renderCUDA(
 		out_depth[pix_id] = D;
 		out_mask[pix_id] = M;
 
-		for (int i = 0; i < N; ++i)
-			ray_depths[i * H * W + pix_id] = ray_depth[i];
+		for (int i = 0; i < N; ++i) {
+            ray_depths[i * H * W + pix_id] = ray_depth[i];
+            ray_alphas[i * H * W + pix_id] = ray_alpha[i];
+        }
 	}
 }
 
@@ -407,7 +415,8 @@ void FORWARD::render(
 	float* out_color,
 	float* out_depth,
 	float* out_mask,
-	float* ray_depths)
+    float* ray_depths,
+    float* ray_alphas)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
 		ranges,
@@ -423,7 +432,8 @@ void FORWARD::render(
 		out_color,
 		out_depth,
 		out_mask,
-		ray_depths);
+		ray_depths,
+        ray_alphas);
 }
 
 void FORWARD::preprocess(int P, int D, int M,

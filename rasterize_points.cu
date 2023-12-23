@@ -32,7 +32,7 @@ std::function<char*(size_t N)> resizeFunctional(torch::Tensor& t) {
     return lambda;
 }
 
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,
@@ -72,6 +72,7 @@ RasterizeGaussiansCUDA(
 
   int n = 32;
   torch::Tensor ray_depths = torch::full({32, H, W}, 0.0, float_opts);
+  torch::Tensor ray_alphas = torch::full({32, H, W}, 0.0, float_opts);
 
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
@@ -116,10 +117,11 @@ RasterizeGaussiansCUDA(
 		out_depth.contiguous().data<float>(),
 		out_mask.contiguous().data<float>(),
         ray_depths.contiguous().data<float>(),
+        ray_alphas.contiguous().data<float>(),
 		radii.contiguous().data<int>(),
 		debug);
   }
-  return std::make_tuple(rendered, out_color, out_depth, out_mask, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths);
+  return std::make_tuple(rendered, out_color, out_depth, out_mask, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, ray_alphas);
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
@@ -137,7 +139,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
 	const float tan_fovx,
 	const float tan_fovy,
     const torch::Tensor& dL_dout_color,
-        const torch::Tensor& dL_dout_depth,
+    const torch::Tensor& dL_dout_depth,
 	const torch::Tensor& sh,
 	const int degree,
 	const torch::Tensor& campos,
@@ -145,6 +147,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
 	const int R,
 	const torch::Tensor& binningBuffer,
 	const torch::Tensor& imageBuffer,
+    const torch::Tensor& dL_dout_ray_depths,
+    const torch::Tensor& dL_dout_ray_alphas,
 	const bool debug)
 {
   const int P = means3D.size(0);
@@ -199,6 +203,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
 	  dL_dsh.contiguous().data<float>(),
 	  dL_dscales.contiguous().data<float>(),
 	  dL_drotations.contiguous().data<float>(),
+      dL_dout_ray_depths.contiguous().data<float>(),
+      dL_dout_ray_alphas.contiguous().data<float>(),
 	  debug);
   }
 

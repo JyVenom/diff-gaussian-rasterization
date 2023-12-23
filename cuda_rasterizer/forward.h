@@ -63,7 +63,8 @@ namespace FORWARD
 		float* out_color,
 		float* out_depth,
         float* out_mask,
-        float* ray_depths);
+        float* ray_depths,
+        float* ray_alphas);
 }
 
 

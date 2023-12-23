@@ -19,9 +19,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f783afc-f17f-4c33-89b8-7b86bf9503f3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../arguments/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../arguments/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../scene/gaussian_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../scene/gaussian_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/diff-gaussian-rasterization.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/diff-gaussian-rasterization.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/backward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/backward.cu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/backward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/backward.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer.h" afterDir="false" />
@@ -58,7 +65,9 @@
     &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
     &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;spsr-guided&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Jerry/Code/Python/gaussian-splatting/submodules/diff-gaussian-rasterization&quot;
   }
 }</component>

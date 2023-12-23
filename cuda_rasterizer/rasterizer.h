@@ -52,6 +52,7 @@ namespace CudaRasterizer
 			float* out_depth,
 			float* out_mask,
 			float* ray_depths,
+			float* ray_alphas,
 			int* radii = nullptr,
 			bool debug = false);
 
@@ -85,6 +86,8 @@ namespace CudaRasterizer
 			float* dL_dsh,
 			float* dL_dscale,
 			float* dL_drot,
+            const float* dL_ray_depths,
+            const float* dL_ray_alphas,
 			bool debug);
 	};
 };
