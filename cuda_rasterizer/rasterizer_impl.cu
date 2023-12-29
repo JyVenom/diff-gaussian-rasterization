@@ -175,6 +175,8 @@ CudaRasterizer::ImageState CudaRasterizer::ImageState::fromChunk(char*& chunk, s
 	obtain(chunk, img.accum_alpha, N, 128);
 	obtain(chunk, img.n_contrib, N, 128);
 	obtain(chunk, img.ranges, N, 128);
+	obtain(chunk, img.ray_n_contrib, N, 128);
+	obtain(chunk, img.ray_n, N, 128);
 	return img;
 }
 
@@ -339,7 +341,9 @@ int CudaRasterizer::Rasterizer::forward(
 		out_depth,
 		out_mask,
 		ray_depths,
-		ray_alphas), debug)
+		ray_alphas,
+		imgState.ray_n_contrib,
+		imgState.ray_n), debug)
 
 	return num_rendered;
 }
@@ -420,7 +424,9 @@ void CudaRasterizer::Rasterizer::backward(
 		dL_dopacity,
 		dL_dcolor,
         dL_ray_depths,
-        dL_ray_alphas), debug)
+        dL_ray_alphas,
+		imgState.ray_n_contrib,
+		imgState.ray_n), debug)
 
 	// Take care of the rest of preprocessing. Was the precomputed covariance
 	// given to us or a scales/rot pair? If precomputed, pass that. If not,

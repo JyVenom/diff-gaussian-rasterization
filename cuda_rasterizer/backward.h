@@ -39,7 +39,9 @@ namespace BACKWARD
 		float* dL_dopacity,
 		float* dL_dcolors,
         const float* dL_ray_depths,
-        const float* dL_ray_alphas);
+        const float* dL_ray_alphas,
+        const uint32_t* ray_n_contrib,
+        const uint32_t* ray_n);
 
 	void preprocess(
 		int P, int D, int M,

@@ -416,7 +416,9 @@ renderCUDA(
 	float* __restrict__ dL_dopacity,
 	float* __restrict__ dL_dcolors,
     const float* __restrict__ dL_ray_depths,
-    const float* __restrict__ dL_ray_alphas)
+    const float* __restrict__ dL_ray_alphas,
+	const uint32_t* __restrict__ ray_n_contrib,
+	const uint32_t* __restrict__ ray_n)
 {
 	// We rasterize again. Compute necessary block info.
 	auto block = cg::this_thread_block();
@@ -458,7 +460,7 @@ renderCUDA(
 	if (inside){
 		for (int i = 0; i < C; i++)
 			dL_dpixel[i] = dL_dpixels[i * H * W + pix_id];
-	        dL_depth = dL_depths[pix_id];
+		dL_depth = dL_depths[pix_id];
 	}
 
 	float last_alpha = 0;
@@ -470,11 +472,22 @@ renderCUDA(
 	const float ddelx_dx = 0.5 * W;
 	const float ddely_dy = 0.5 * H;
 
+
+	const int N = 32;
+	float dL_ray_depth[N] = { 0 };
+	float dL_ray_alpha[N] = { 0 };
+	int cnt = ray_n[pix_id];
+	for (int i = 0; i < N; ++i) {
+		dL_ray_depth[i] = dL_ray_depths[i * H * W + pix_id];
+		dL_ray_alpha[i] = dL_ray_alphas[i * H * W + pix_id];
+	}
+	const int ray_last_contributor = inside ? ray_n_contrib[pix_id] : 0;
+
 	// Traverse all Gaussians
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
 	{
 		// Load auxiliary data into shared memory, start in the BACK
-		// and load them in revers order.
+		// and load them in reverse order.
 		block.sync();
 		const int progress = i * BLOCK_SIZE + block.thread_rank();
 		if (range.x + progress < range.y)
@@ -538,6 +551,13 @@ renderCUDA(
 			last_depth = c_d;
 			dL_dalpha += (c_d - accum_depth_rec) * dL_depth;
 			dL_dalpha *= T;
+
+			if (contributor <= ray_last_contributor) {
+				--cnt;
+				dL_dalpha += dL_ray_alpha[cnt];
+				dL_dalpha += dL_ray_depth[cnt];
+			}
+
 			// Update last alpha (to be used in the next iteration)
 			last_alpha = alpha;
 
@@ -655,7 +675,9 @@ void BACKWARD::render(
 	float* dL_dopacity,
 	float* dL_dcolors,
     const float* dL_ray_depths,
-    const float* dL_ray_alphas)
+    const float* dL_ray_alphas,
+	const uint32_t* ray_n_contrib,
+	const uint32_t* ray_n)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> >(
 		ranges,
@@ -675,6 +697,8 @@ void BACKWARD::render(
 		dL_dopacity,
 		dL_dcolors,
         dL_ray_depths,
-        dL_ray_alphas
+        dL_ray_alphas,
+		ray_n_contrib,
+		ray_n
 		);
 }
