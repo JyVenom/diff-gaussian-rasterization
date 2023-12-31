@@ -19,14 +19,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8f783afc-f17f-4c33-89b8-7b86bf9503f3" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../gaussian_renderer/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../scene/gaussian_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../scene/gaussian_model.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$" beforeDir="false" afterPath="$PROJECT_DIR$" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/backward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/backward.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/backward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/backward.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/forward.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/forward.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.cu" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.h" beforeDir="false" afterPath="$PROJECT_DIR$/cuda_rasterizer/rasterizer_impl.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/diff_gaussian_rasterization/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/diff_gaussian_rasterization/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rasterize_points.cu" beforeDir="false" afterPath="$PROJECT_DIR$/rasterize_points.cu" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rasterize_points.h" beforeDir="false" afterPath="$PROJECT_DIR$/rasterize_points.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../train.py" beforeDir="false" afterPath="$PROJECT_DIR$/../../train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

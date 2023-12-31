@@ -410,15 +410,12 @@ renderCUDA(
 	const float* __restrict__ final_Ts,
 	const uint32_t* __restrict__ n_contrib,
 	const float* __restrict__ dL_dpixels,
-	const float* __restrict__ dL_depths,
+    const float* __restrict__ dL_depths,
+    const float* __restrict__ dL_dsums,
 	float3* __restrict__ dL_dmean2D,
 	float4* __restrict__ dL_dconic2D,
 	float* __restrict__ dL_dopacity,
-	float* __restrict__ dL_dcolors,
-    const float* __restrict__ dL_ray_depths,
-    const float* __restrict__ dL_ray_alphas,
-	const uint32_t* __restrict__ ray_n_contrib,
-	const uint32_t* __restrict__ ray_n)
+	float* __restrict__ dL_dcolors)
 {
 	// We rasterize again. Compute necessary block info.
 	auto block = cg::this_thread_block();
@@ -472,16 +469,10 @@ renderCUDA(
 	const float ddelx_dx = 0.5 * W;
 	const float ddely_dy = 0.5 * H;
 
-
-	const int N = 32;
-	float dL_ray_depth[N] = { 0 };
-	float dL_ray_alpha[N] = { 0 };
-	int cnt = ray_n[pix_id];
-	for (int i = 0; i < N; ++i) {
-		dL_ray_depth[i] = dL_ray_depths[i * H * W + pix_id];
-		dL_ray_alpha[i] = dL_ray_alphas[i * H * W + pix_id];
-	}
-	const int ray_last_contributor = inside ? ray_n_contrib[pix_id] : 0;
+    float dL_dsum;
+    if (inside){
+        dL_dsum = dL_dsums[pix_id];
+    }
 
 	// Traverse all Gaussians
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -552,12 +543,6 @@ renderCUDA(
 			dL_dalpha += (c_d - accum_depth_rec) * dL_depth;
 			dL_dalpha *= T;
 
-			if (contributor <= ray_last_contributor) {
-				--cnt;
-				dL_dalpha += dL_ray_alpha[cnt];
-				dL_dalpha += dL_ray_depth[cnt];
-			}
-
 			// Update last alpha (to be used in the next iteration)
 			last_alpha = alpha;
 
@@ -569,8 +554,9 @@ renderCUDA(
 			dL_dalpha += (-T_final / (1.f - alpha)) * bg_dot_dpixel;
 
 
+			// My Loss (sum alphas)
 			// Helpful reusable temporary variables
-			const float dL_dG = con_o.w * dL_dalpha;
+			const float dL_dG = con_o.w * dL_dalpha + dL_dsum * (con_o.w * T);;
 			const float gdx = G * d.x;
 			const float gdy = G * d.y;
 			const float dG_ddelx = -gdx * con_o.x - gdy * con_o.y;
@@ -587,6 +573,9 @@ renderCUDA(
 
 			// Update gradients w.r.t. opacity of the Gaussian
 			atomicAdd(&(dL_dopacity[global_id]), G * dL_dalpha);
+
+			// My Loss (sum alphas) part 2
+			atomicAdd(&(dL_dopacity[global_id]), dL_dsum * G * T);
 		}
 	}
 }
@@ -669,15 +658,12 @@ void BACKWARD::render(
 	const float* final_Ts,
 	const uint32_t* n_contrib,
 	const float* dL_dpixels,
-	const float* dL_depths,
+    const float* dL_depths,
+    const float* dL_dsums,
 	float3* dL_dmean2D,
 	float4* dL_dconic2D,
 	float* dL_dopacity,
-	float* dL_dcolors,
-    const float* dL_ray_depths,
-    const float* dL_ray_alphas,
-	const uint32_t* ray_n_contrib,
-	const uint32_t* ray_n)
+	float* dL_dcolors)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> >(
 		ranges,
@@ -692,13 +678,10 @@ void BACKWARD::render(
 		n_contrib,
 		dL_dpixels,
 		dL_depths,
+        dL_dsums,
 		dL_dmean2D,
 		dL_dconic2D,
 		dL_dopacity,
-		dL_dcolors,
-        dL_ray_depths,
-        dL_ray_alphas,
-		ray_n_contrib,
-		ray_n
+		dL_dcolors
 		);
 }

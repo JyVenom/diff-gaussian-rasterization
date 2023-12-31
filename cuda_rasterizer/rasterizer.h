@@ -50,7 +50,8 @@ namespace CudaRasterizer
 			const bool prefiltered,
 			float* out_color,
 			float* out_depth,
-			float* out_mask,
+            float* out_mask,
+            float* out_sum,
 			float* ray_depths,
 			float* ray_alphas,
 			int* radii = nullptr,
@@ -77,6 +78,7 @@ namespace CudaRasterizer
 			char* image_buffer,
 			const float* dL_dpix,
 			const float* dL_depths,
+			const float* dL_sums,
 			float* dL_dmean2D,
 			float* dL_dconic,
 			float* dL_dopacity,
@@ -86,8 +88,6 @@ namespace CudaRasterizer
 			float* dL_dsh,
 			float* dL_dscale,
 			float* dL_drot,
-            const float* dL_ray_depths,
-            const float* dL_ray_alphas,
 			bool debug);
 	};
 };

@@ -33,15 +33,12 @@ namespace BACKWARD
 		const float* final_Ts,
 		const uint32_t* n_contrib,
 		const float* dL_dpixels,
-		const float* dL_depths,
+        const float* dL_depths,
+        const float* dL_sums,
 		float3* dL_dmean2D,
 		float4* dL_dconic2D,
 		float* dL_dopacity,
-		float* dL_dcolors,
-        const float* dL_ray_depths,
-        const float* dL_ray_alphas,
-        const uint32_t* ray_n_contrib,
-        const uint32_t* ray_n);
+		float* dL_dcolors);
 
 	void preprocess(
 		int P, int D, int M,

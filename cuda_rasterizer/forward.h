@@ -62,11 +62,10 @@ namespace FORWARD
 		const float* bg_color,
 		float* out_color,
 		float* out_depth,
-        float* out_mask,
+		float* out_mask,
+		float* out_sum,
         float* ray_depths,
-        float* ray_alphas,
-        uint32_t* ray_n_contrib,
-        uint32_t* ray_n);
+        float* ray_alphas);
 }
 
 

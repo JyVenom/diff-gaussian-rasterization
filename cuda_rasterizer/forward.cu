@@ -274,10 +274,9 @@ renderCUDA(
 	float* __restrict__ out_color,
 	float* __restrict__ out_depth,
 	float* __restrict__ out_mask,
+	float* __restrict__ out_sum,
 	float* __restrict__ ray_depths,
-    float* __restrict__ ray_alphas,
-    uint32_t* __restrict__ ray_n_contrib,
-    uint32_t* __restrict__ ray_n)
+    float* __restrict__ ray_alphas)
 {
 	// Identify current tile and associated min/max pixel range.
 	auto block = cg::this_thread_block();
@@ -310,12 +309,12 @@ renderCUDA(
 	float C[CHANNELS] = { 0 };
 	float D = { 0 };
 	float M = { 0 };
+	float A = { 0 };
 
 	const int N = 32;
 	float ray_depth[N] = { 0 };
     float ray_alpha[N] = { 0 };
 	int cnt = 0;
-	uint32_t ray_last_contributor = 0;
 
 	// Iterate over batches until all done or range is complete
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -370,16 +369,12 @@ renderCUDA(
 				C[ch] += features[collected_id[j] * CHANNELS + ch] * alpha * T;
 			D += depths[collected_id[j]] * alpha * T;
 			M += alpha * T;
+			A += alpha;
 
 			if (cnt < N) {
                 ray_depth[cnt] = depths[collected_id[j]];
                 ray_alpha[cnt] = alpha;
                 ++cnt;
-				ray_last_contributor = contributor;
-            }
-            else {
-                done = true;
-                continue;
             }
 
 			T = test_T;
@@ -400,13 +395,12 @@ renderCUDA(
 			out_color[ch * H * W + pix_id] = C[ch] + T * bg_color[ch];
 		out_depth[pix_id] = D;
 		out_mask[pix_id] = M;
+		out_sum[pix_id] = A;
 
 		for (int i = 0; i < N; ++i) {
             ray_depths[i * H * W + pix_id] = ray_depth[i];
             ray_alphas[i * H * W + pix_id] = ray_alpha[i];
         }
-		ray_n_contrib[pix_id] = ray_last_contributor;
-        ray_n[pix_id] = cnt;
 	}
 }
 
@@ -425,10 +419,9 @@ void FORWARD::render(
 	float* out_color,
 	float* out_depth,
 	float* out_mask,
+	float* out_sum,
     float* ray_depths,
-    float* ray_alphas,
-    uint32_t* ray_n_contrib,
-    uint32_t* ray_n)
+    float* ray_alphas)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
 		ranges,
@@ -444,10 +437,9 @@ void FORWARD::render(
 		out_color,
 		out_depth,
 		out_mask,
+		out_sum,
 		ray_depths,
-        ray_alphas,
-		ray_n_contrib,
-        ray_n);
+        ray_alphas);
 }
 
 void FORWARD::preprocess(int P, int D, int M,
