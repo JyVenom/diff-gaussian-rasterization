@@ -32,12 +32,13 @@ std::function<char*(size_t N)> resizeFunctional(torch::Tensor& t) {
     return lambda;
 }
 
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,
     const torch::Tensor& colors,
-    const torch::Tensor& opacity,
+	const torch::Tensor& opacity,
+	const torch::Tensor& indices,
 	const torch::Tensor& scales,
 	const torch::Tensor& rotations,
 	const float scale_modifier,
@@ -69,11 +70,12 @@ RasterizeGaussiansCUDA(
   torch::Tensor out_depth = torch::full({1, H, W}, 0.0, float_opts);
   torch::Tensor out_mask = torch::full({1, H, W}, 0.0, float_opts);
   torch::Tensor out_sum = torch::full({1, H, W}, 0.0, float_opts);
-  torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
+  torch::Tensor radii = torch::full({P}, 0, int_opts);
 
   int n = 32;
   torch::Tensor ray_depths = torch::full({32, H, W}, 0.0, float_opts);
   torch::Tensor ray_alphas = torch::full({32, H, W}, 0.0, float_opts);
+  torch::Tensor ray_indices = torch::full({32, H, W}, 0.0, int_opts);
 
   torch::Device device(torch::kCUDA);
   torch::TensorOptions options(torch::kByte);
@@ -104,6 +106,7 @@ RasterizeGaussiansCUDA(
 		sh.contiguous().data_ptr<float>(),
 		colors.contiguous().data<float>(),
 		opacity.contiguous().data<float>(),
+		indices.contiguous().data<int>(),
 		scales.contiguous().data_ptr<float>(),
 		scale_modifier,
 		rotations.contiguous().data_ptr<float>(),
@@ -119,11 +122,12 @@ RasterizeGaussiansCUDA(
 		out_mask.contiguous().data<float>(),
 		out_sum.contiguous().data<float>(),
         ray_depths.contiguous().data<float>(),
-        ray_alphas.contiguous().data<float>(),
+		ray_alphas.contiguous().data<float>(),
+		ray_indices.contiguous().data<int>(),
 		radii.contiguous().data<int>(),
 		debug);
   }
-  return std::make_tuple(rendered, out_color, out_depth, out_mask, out_sum, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, ray_alphas);
+  return std::make_tuple(rendered, out_color, out_depth, out_mask, out_sum, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, ray_alphas, ray_indices);
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
@@ -143,6 +147,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
     const torch::Tensor& dL_dout_color,
 	const torch::Tensor& dL_dout_depth,
 	const torch::Tensor& dL_dout_sum,
+    const torch::Tensor& dL_dout_ray_alphas,
 	const torch::Tensor& sh,
 	const int degree,
 	const torch::Tensor& campos,
@@ -205,6 +210,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
 	  dL_dsh.contiguous().data<float>(),
 	  dL_dscales.contiguous().data<float>(),
 	  dL_drotations.contiguous().data<float>(),
+      dL_dout_ray_alphas.contiguous().data<float>(),
 	  debug);
   }
 

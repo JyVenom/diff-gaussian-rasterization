@@ -161,6 +161,7 @@ CudaRasterizer::GeometryState CudaRasterizer::GeometryState::fromChunk(char*& ch
 	obtain(chunk, geom.means2D, P, 128);
 	obtain(chunk, geom.cov3D, P * 6, 128);
 	obtain(chunk, geom.conic_opacity, P, 128);
+	obtain(chunk, geom.indices_arr, P, 128);
 	obtain(chunk, geom.rgb, P * 3, 128);
 	obtain(chunk, geom.tiles_touched, P, 128);
 	cub::DeviceScan::InclusiveSum(nullptr, geom.scan_size, geom.tiles_touched, geom.tiles_touched, P);
@@ -175,6 +176,8 @@ CudaRasterizer::ImageState CudaRasterizer::ImageState::fromChunk(char*& chunk, s
 	obtain(chunk, img.accum_alpha, N, 128);
 	obtain(chunk, img.n_contrib, N, 128);
 	obtain(chunk, img.ranges, N, 128);
+    obtain(chunk, img.ray_n_contrib, N, 128);
+    obtain(chunk, img.ray_n, N, 128);
 	return img;
 }
 
@@ -206,6 +209,7 @@ int CudaRasterizer::Rasterizer::forward(
 	const float* shs,
 	const float* colors_precomp,
 	const float* opacities,
+	const int* indices,
 	const float* scales,
 	const float scale_modifier,
 	const float* rotations,
@@ -221,6 +225,7 @@ int CudaRasterizer::Rasterizer::forward(
     float* out_sum,
 	float* ray_depths,
 	float* ray_alphas,
+	int* ray_indices,
 	int* radii,
 	bool debug)
 {
@@ -257,6 +262,7 @@ int CudaRasterizer::Rasterizer::forward(
 		scale_modifier,
 		(glm::vec4*)rotations,
 		opacities,
+		indices,
 		shs,
 		geomState.clamped,
 		cov3D_precomp,
@@ -272,6 +278,7 @@ int CudaRasterizer::Rasterizer::forward(
 		geomState.cov3D,
 		geomState.rgb,
 		geomState.conic_opacity,
+		geomState.indices_arr,
 		tile_grid,
 		geomState.tiles_touched,
 		prefiltered
@@ -333,6 +340,7 @@ int CudaRasterizer::Rasterizer::forward(
 		feature_ptr,
 		geomState.depths,
 		geomState.conic_opacity,
+		geomState.indices_arr,
 		imgState.accum_alpha,
 		imgState.n_contrib,
 		background,
@@ -341,7 +349,10 @@ int CudaRasterizer::Rasterizer::forward(
 		out_mask,
         out_sum,
 		ray_depths,
-		ray_alphas), debug)
+		ray_alphas,
+		ray_indices,
+        imgState.ray_n_contrib,
+        imgState.ray_n), debug)
 
 	return num_rendered;
 }
@@ -379,6 +390,7 @@ void CudaRasterizer::Rasterizer::backward(
 	float* dL_dsh,
 	float* dL_dscale,
 	float* dL_drot,
+    const float* dL_ray_alphas,
 	bool debug)
 {
 	GeometryState geomState = GeometryState::fromChunk(geom_buffer, P);
@@ -420,7 +432,10 @@ void CudaRasterizer::Rasterizer::backward(
 		(float3*)dL_dmean2D,
 		(float4*)dL_dconic,
 		dL_dopacity,
-		dL_dcolor), debug)
+		dL_dcolor,
+        imgState.ray_n_contrib,
+        imgState.ray_n,
+        dL_ray_alphas), debug)
 
 	// Take care of the rest of preprocessing. Was the precomputed covariance
 	// given to us or a scales/rot pair? If precomputed, pass that. If not,

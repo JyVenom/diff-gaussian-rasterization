@@ -159,6 +159,7 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	const float scale_modifier,
 	const glm::vec4* rotations,
 	const float* opacities,
+   	const int* indices,
 	const float* shs,
 	bool* clamped,
 	const float* cov3D_precomp,
@@ -175,6 +176,7 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	float* cov3Ds,
 	float* rgb,
 	float4* conic_opacity,
+	int* indices_arr,
 	const dim3 grid,
 	uint32_t* tiles_touched,
 	bool prefiltered)
@@ -253,6 +255,8 @@ __global__ void preprocessCUDA(int P, int D, int M,
 	// Inverse 2D covariance and opacity neatly pack into one float4
 	conic_opacity[idx] = { conic.x, conic.y, conic.z, opacities[idx] };
 	tiles_touched[idx] = (rect_max.y - rect_min.y) * (rect_max.x - rect_min.x);
+
+	indices_arr[idx] = indices[idx];
 }
 
 // Main rasterization method. Collaboratively works on one tile per
@@ -268,6 +272,7 @@ renderCUDA(
 	const float* __restrict__ features,
 	const float* __restrict__ depths,
 	const float4* __restrict__ conic_opacity,
+	const int* __restrict__ indices_arr,
 	float* __restrict__ final_T,
 	uint32_t* __restrict__ n_contrib,
 	const float* __restrict__ bg_color,
@@ -276,7 +281,10 @@ renderCUDA(
 	float* __restrict__ out_mask,
 	float* __restrict__ out_sum,
 	float* __restrict__ ray_depths,
-    float* __restrict__ ray_alphas)
+	float* __restrict__ ray_alphas,
+	int* __restrict__ ray_indices,
+    uint32_t* __restrict__ ray_n_contrib,
+    uint32_t* __restrict__ ray_n)
 {
 	// Identify current tile and associated min/max pixel range.
 	auto block = cg::this_thread_block();
@@ -313,8 +321,14 @@ renderCUDA(
 
 	const int N = 32;
 	float ray_depth[N] = { 0 };
-    float ray_alpha[N] = { 0 };
+	float ray_alpha[N] = { 0 };
+	int ray_index[N];
+#pragma unroll
+	for (int i = 0; i < N; ++i) {
+		ray_index[i] = -1;
+	}
 	int cnt = 0;
+	uint32_t ray_last_contributor = 0;
 
 	// Iterate over batches until all done or range is complete
 	for (int i = 0; i < rounds; i++, toDo -= BLOCK_SIZE)
@@ -374,7 +388,9 @@ renderCUDA(
 			if (cnt < N) {
                 ray_depth[cnt] = depths[collected_id[j]];
                 ray_alpha[cnt] = alpha;
+				ray_index[cnt] = indices_arr[collected_id[j]];
                 ++cnt;
+				ray_last_contributor = contributor;
             }
 
 			T = test_T;
@@ -400,7 +416,10 @@ renderCUDA(
 		for (int i = 0; i < N; ++i) {
             ray_depths[i * H * W + pix_id] = ray_depth[i];
             ray_alphas[i * H * W + pix_id] = ray_alpha[i];
-        }
+			ray_indices[i * H * W + pix_id] = ray_index[i];
+		}
+		ray_n_contrib[pix_id] = ray_last_contributor;
+		ray_n[pix_id] = cnt;
 	}
 }
 
@@ -413,6 +432,7 @@ void FORWARD::render(
 	const float* colors,
 	const float* depths,
 	const float4* conic_opacity,
+	const int* indices_arr,
 	float* final_T,
 	uint32_t* n_contrib,
 	const float* bg_color,
@@ -421,7 +441,10 @@ void FORWARD::render(
 	float* out_mask,
 	float* out_sum,
     float* ray_depths,
-    float* ray_alphas)
+    float* ray_alphas,
+	int* ray_indices,
+    uint32_t* ray_n_contrib,
+    uint32_t* ray_n)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> > (
 		ranges,
@@ -431,6 +454,7 @@ void FORWARD::render(
 		colors,
 		depths,
 		conic_opacity,
+		indices_arr,
 		final_T,
 		n_contrib,
 		bg_color,
@@ -439,7 +463,10 @@ void FORWARD::render(
 		out_mask,
 		out_sum,
 		ray_depths,
-        ray_alphas);
+        ray_alphas,
+		ray_indices,
+        ray_n_contrib,
+        ray_n);
 }
 
 void FORWARD::preprocess(int P, int D, int M,
@@ -448,6 +475,7 @@ void FORWARD::preprocess(int P, int D, int M,
 	const float scale_modifier,
 	const glm::vec4* rotations,
 	const float* opacities,
+	const int* indices,
 	const float* shs,
 	bool* clamped,
 	const float* cov3D_precomp,
@@ -464,6 +492,7 @@ void FORWARD::preprocess(int P, int D, int M,
 	float* cov3Ds,
 	float* rgb,
 	float4* conic_opacity,
+	int* indices_arr,
 	const dim3 grid,
 	uint32_t* tiles_touched,
 	bool prefiltered)
@@ -475,6 +504,7 @@ void FORWARD::preprocess(int P, int D, int M,
 		scale_modifier,
 		rotations,
 		opacities,
+		indices,
 		shs,
 		clamped,
 		cov3D_precomp,
@@ -491,6 +521,7 @@ void FORWARD::preprocess(int P, int D, int M,
 		cov3Ds,
 		rgb,
 		conic_opacity,
+		indices_arr,
 		grid,
 		tiles_touched,
 		prefiltered

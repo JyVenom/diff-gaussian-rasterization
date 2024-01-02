@@ -39,6 +39,7 @@ namespace CudaRasterizer
 			const float* shs,
 			const float* colors_precomp,
 			const float* opacities,
+			const int* indices,
 			const float* scales,
 			const float scale_modifier,
 			const float* rotations,
@@ -54,6 +55,7 @@ namespace CudaRasterizer
             float* out_sum,
 			float* ray_depths,
 			float* ray_alphas,
+			int* ray_indices,
 			int* radii = nullptr,
 			bool debug = false);
 
@@ -88,6 +90,7 @@ namespace CudaRasterizer
 			float* dL_dsh,
 			float* dL_dscale,
 			float* dL_drot,
+			const float* dL_ray_alphas,
 			bool debug);
 	};
 };

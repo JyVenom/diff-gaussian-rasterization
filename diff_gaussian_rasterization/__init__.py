@@ -55,6 +55,8 @@ class _RasterizeGaussians(torch.autograd.Function):
         cov3Ds_precomp,
         raster_settings,
     ):
+        # Generate indexes to pull from
+        indices = torch.arange(means3D.size(0), dtype=torch.int32, device='cuda')
 
         # Restructure arguments the way that the C++ lib expects them
         args = (
@@ -62,6 +64,7 @@ class _RasterizeGaussians(torch.autograd.Function):
             means3D,
             colors_precomp,
             opacities,
+            indices,
             scales,
             rotations,
             raster_settings.scale_modifier,
@@ -83,22 +86,22 @@ class _RasterizeGaussians(torch.autograd.Function):
         if raster_settings.debug:
             cpu_args = cpu_deep_copy_tuple(args) # Copy them before they can be corrupted
             try:
-                num_rendered, color, depth, mask, sum_alphas, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, rays_alphas = _C.rasterize_gaussians(*args)
+                num_rendered, color, depth, mask, sum_alphas, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, rays_alphas, ray_indices = _C.rasterize_gaussians(*args)
             except Exception as ex:
                 torch.save(cpu_args, "snapshot_fw.dump")
                 print("\nAn error occured in forward. Please forward snapshot_fw.dump for debugging.")
                 raise ex
         else:
-            num_rendered, color, depth, mask, sum_alphas, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, rays_alphas = _C.rasterize_gaussians(*args)
+            num_rendered, color, depth, mask, sum_alphas, radii, geomBuffer, binningBuffer, imgBuffer, ray_depths, rays_alphas, ray_indices = _C.rasterize_gaussians(*args)
 
         # Keep relevant tensors for backward
         ctx.raster_settings = raster_settings
         ctx.num_rendered = num_rendered
         ctx.save_for_backward(colors_precomp, means3D, scales, rotations, cov3Ds_precomp, radii, sh, geomBuffer, binningBuffer, imgBuffer)
-        return color, radii, depth, mask, sum_alphas, ray_depths, rays_alphas
+        return color, radii, depth, mask, sum_alphas, ray_depths, rays_alphas, ray_indices
 
     @staticmethod
-    def backward(ctx, grad_out_color, grad_radii, grad_depth, grad_mask, grad_sum_alphas, grad_ray_depths, grad_rays_alphas):
+    def backward(ctx, grad_out_color, grad_radii, grad_depth, grad_mask, grad_sum_alphas, grad_ray_depths, grad_rays_alphas, grad_ray_indices):
 
         # Restore necessary values from context
         num_rendered = ctx.num_rendered
@@ -121,6 +124,7 @@ class _RasterizeGaussians(torch.autograd.Function):
                 grad_out_color,
                 grad_depth,
                 grad_sum_alphas,
+                grad_rays_alphas,
                 sh,
                 raster_settings.sh_degree,
                 raster_settings.campos,

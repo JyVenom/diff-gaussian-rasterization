@@ -15,12 +15,13 @@
 #include <tuple>
 #include <string>
 	
-std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
+std::tuple<int, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
 RasterizeGaussiansCUDA(
 	const torch::Tensor& background,
 	const torch::Tensor& means3D,
     const torch::Tensor& colors,
-    const torch::Tensor& opacity,
+	const torch::Tensor& opacity,
+	const torch::Tensor& indices,
 	const torch::Tensor& scales,
 	const torch::Tensor& rotations,
 	const float scale_modifier,
@@ -54,6 +55,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
     const torch::Tensor& dL_dout_color,
 	const torch::Tensor& dL_dout_depth,
 	const torch::Tensor& dL_dout_sum,
+	const torch::Tensor& dL_dout_ray_alphas,
 	const torch::Tensor& sh,
 	const int degree,
 	const torch::Tensor& campos,

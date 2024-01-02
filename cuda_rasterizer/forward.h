@@ -27,6 +27,7 @@ namespace FORWARD
 		const float scale_modifier,
 		const glm::vec4* rotations,
 		const float* opacities,
+		const int* indices,
 		const float* shs,
 		bool* clamped,
 		const float* cov3D_precomp,
@@ -43,6 +44,7 @@ namespace FORWARD
 		float* cov3Ds,
 		float* colors,
 		float4* conic_opacity,
+		int* indices_arr,
 		const dim3 grid,
 		uint32_t* tiles_touched,
 		bool prefiltered);
@@ -57,6 +59,7 @@ namespace FORWARD
 		const float* features,
 		const float* depths,
 		const float4* conic_opacity,
+		const int* indices_arr,
 		float* final_T,
 		uint32_t* n_contrib,
 		const float* bg_color,
@@ -65,7 +68,10 @@ namespace FORWARD
 		float* out_mask,
 		float* out_sum,
         float* ray_depths,
-        float* ray_alphas);
+        float* ray_alphas,
+		int* ray_indices,
+        uint32_t* ray_n_contrib,
+        uint32_t* ray_n);
 }
 
 
