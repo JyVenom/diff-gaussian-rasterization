@@ -56,6 +56,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
 	const torch::Tensor& dL_dout_depth,
 	const torch::Tensor& dL_dout_sum,
 	const torch::Tensor& dL_dout_ray_alphas,
+	const torch::Tensor& dL_dout_ray_depths,
 	const torch::Tensor& sh,
 	const int degree,
 	const torch::Tensor& campos,

@@ -91,6 +91,7 @@ namespace CudaRasterizer
 			float* dL_dscale,
 			float* dL_drot,
 			const float* dL_ray_alphas,
+			const float* dL_ray_depths,
 			bool debug);
 	};
 };

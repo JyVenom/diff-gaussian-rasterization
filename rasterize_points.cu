@@ -147,7 +147,8 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
     const torch::Tensor& dL_dout_color,
 	const torch::Tensor& dL_dout_depth,
 	const torch::Tensor& dL_dout_sum,
-    const torch::Tensor& dL_dout_ray_alphas,
+	const torch::Tensor& dL_dout_ray_alphas,
+	const torch::Tensor& dL_dout_ray_depths,
 	const torch::Tensor& sh,
 	const int degree,
 	const torch::Tensor& campos,
@@ -211,6 +212,7 @@ std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Te
 	  dL_dscales.contiguous().data<float>(),
 	  dL_drotations.contiguous().data<float>(),
       dL_dout_ray_alphas.contiguous().data<float>(),
+	  dL_dout_ray_depths.contiguous().data<float>(),
 	  debug);
   }
 

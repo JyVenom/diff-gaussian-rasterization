@@ -418,7 +418,8 @@ renderCUDA(
 	float* __restrict__ dL_dcolors,
 	const uint32_t* __restrict__ ray_n_contrib,
 	const uint32_t* __restrict__ ray_n,
-    const float* __restrict__ dL_ray_alphas)
+    const float* __restrict__ dL_ray_alphas,
+    const float* __restrict__ dL_ray_depths)
 {
 	// We rasterize again. Compute necessary block info.
 	auto block = cg::this_thread_block();
@@ -696,7 +697,8 @@ void BACKWARD::render(
 	float* dL_dcolors,
 	const uint32_t* ray_n_contrib,
 	const uint32_t* ray_n,
-    const float* dL_ray_alphas)
+    const float* dL_ray_alphas,
+    const float* dL_ray_depths)
 {
 	renderCUDA<NUM_CHANNELS> << <grid, block >> >(
 		ranges,
@@ -718,6 +720,7 @@ void BACKWARD::render(
 		dL_dcolors,
 		ray_n_contrib,
 		ray_n,
-        dL_ray_alphas
+        dL_ray_alphas,
+        dL_ray_depths
 		);
 }
